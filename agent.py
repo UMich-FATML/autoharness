@@ -110,7 +110,10 @@ def create_agent(environment: BaseEnvironment) -> Agent:
         instructions=SYSTEM_PROMPT,
         tools=tools,
         model=MODEL,
-        model_settings=ModelSettings(truncation="auto"),
+        model_settings=ModelSettings(
+            truncation="auto",
+            parallel_tool_calls=True,
+        ),
     )
 
 
