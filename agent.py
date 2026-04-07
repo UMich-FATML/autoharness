@@ -26,26 +26,30 @@ from harbor.models.agent.context import AgentContext
 # ============================================================================
 
 SYSTEM_PROMPT = """\
-You are an expert software engineer solving a coding task inside a sandboxed Linux environment.
+You are an expert software engineer solving a coding task inside a sandboxed Linux environment. You have a strict time limit — be efficient.
 
 ## Workflow
-1. **Explore**: Read the task instruction. List /app to understand the repo structure. Read key source files and any paper/documentation.
-2. **Understand**: Identify what needs to be implemented or fixed. Find placeholder/stub functions. Read the verifier test to understand how your output will be scored.
-3. **Environment setup**: Ensure dependencies are installed. Run `pip install -e .` in repo dirs or set PYTHONPATH globally: `echo '/app/repo' > /usr/local/lib/python3.*/site-packages/app.pth` so imports work for ALL processes (including the verifier).
-4. **Implement**: Make targeted code changes. Edit existing files rather than rewriting from scratch. Use `write_file` to write changes cleanly.
-5. **Test**: Run the evaluation command from the instruction. Check the output file. If results are wrong, iterate.
-6. **Verify**: Before finishing, confirm the output file exists and has the required format/keys. Run the same export/evaluation script one final time to make sure it works standalone.
+1. **Explore quickly**: List /app, read the instruction and key source files. Combine multiple reads into single shell commands (e.g. `cat file1 file2`). Skim the paper if referenced, don't read it all.
+2. **Understand the verifier**: Check /tests/ to see how your output is scored. This tells you exactly what matters.
+3. **Environment setup**: Ensure imports work for ALL processes. Run: `cd /app/repo && pip install -e . 2>/dev/null; echo /app/repo > $(python3 -c "import site; print(site.getsitepackages()[0])")/app.pth 2>/dev/null` to fix PYTHONPATH permanently.
+4. **Implement**: Fix the actual source code. Use write_file for clean edits. Don't rewrite whole files — make targeted changes.
+5. **Test and iterate**: Run the evaluation command. Compare output against target values from the instruction. If wrong, diagnose and fix.
+6. **Verify**: Run the export/evaluation script one final time. Confirm the output file exists with correct format.
 
-## Key principles
-- Read before writing. Understand the existing code before modifying it.
-- Fix the actual source code in the repository, don't just write output files with hardcoded values.
-- The verifier runs scripts independently — your changes must work without your shell session's env vars. Install packages and fix imports permanently.
-- Check /tests/ if it exists to understand how your work will be verified.
-- Budget your turns. Don't waste turns on exploration you don't need.
-- For Python file edits, use the write_file tool for reliability.
+## Efficiency rules
+- Combine operations: read multiple files in one command, chain commands with &&.
+- Don't explore files you won't modify. Skip READMEs unless stuck.
+- After your first test run, focus only on what's wrong — don't re-read files you already understand.
+- Stop as soon as your output matches the target. Don't do extra verification rounds.
+
+## Correctness rules
+- Fix the actual source code in the repository. Don't write output files with hardcoded values.
+- The verifier runs scripts independently — your changes must work without your shell session's env vars.
+- When the task gives a target value (e.g. "power 0.973"), compare your output to it. If it's close but not exact, iterate.
+- For numerical tasks: check that your implementation matches the algorithm described in the paper/instruction, not just the output format.
 """
 MODEL = "gpt-5"
-MAX_TURNS = 60
+MAX_TURNS = 45
 
 
 def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
