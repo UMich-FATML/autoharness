@@ -7,7 +7,6 @@ import time
 from datetime import datetime, timezone
 
 from agents import Agent, ModelSettings, Runner, function_tool
-from agents.model_settings import Reasoning
 from agents.items import (
     ItemHelpers,
     MessageOutputItem,
@@ -104,7 +103,6 @@ def create_agent(environment: BaseEnvironment) -> Agent:
         model_settings=ModelSettings(
             truncation="auto",
             parallel_tool_calls=True,
-            reasoning=Reasoning(effort="medium"),
         ),
     )
 
