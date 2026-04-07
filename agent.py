@@ -6,7 +6,7 @@ import json
 import time
 from datetime import datetime, timezone
 
-from agents import Agent, Runner, function_tool
+from agents import Agent, ModelSettings, Runner, function_tool
 from agents.items import (
     ItemHelpers,
     MessageOutputItem,
@@ -110,6 +110,7 @@ def create_agent(environment: BaseEnvironment) -> Agent:
         instructions=SYSTEM_PROMPT,
         tools=tools,
         model=MODEL,
+        model_settings=ModelSettings(truncation="auto"),
     )
 
 
