@@ -112,9 +112,23 @@ async def run_task(
     instruction: str,
 ) -> tuple[object, int]:
     """Run the agent on a task and return (result, duration_ms)."""
+    # Pre-scan the environment to give the agent a head start.
+    try:
+        scan = await environment.exec(
+            command="find /app -maxdepth 3 -type f | head -60; echo '---'; ls /tests/ 2>/dev/null",
+            timeout_sec=10,
+        )
+        file_tree = (scan.stdout or "").strip()
+    except Exception:
+        file_tree = ""
+
+    augmented = instruction
+    if file_tree:
+        augmented += f"\n\n--- Environment file listing ---\n{file_tree}"
+
     agent = create_agent(environment)
     t0 = time.time()
-    result = await Runner.run(agent, input=instruction, max_turns=MAX_TURNS)
+    result = await Runner.run(agent, input=augmented, max_turns=MAX_TURNS)
     duration_ms = int((time.time() - t0) * 1000)
     return result, duration_ms
 
