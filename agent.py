@@ -52,16 +52,6 @@ MODEL = "gpt-5"
 MAX_TURNS = 45
 
 
-MAX_OUTPUT = 12000
-
-
-def _truncate(text: str, limit: int = MAX_OUTPUT) -> str:
-    if len(text) <= limit:
-        return text
-    keep = limit // 2
-    return text[:keep] + f"\n\n[...truncated {len(text) - limit} chars...]\n\n" + text[-keep:]
-
-
 def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
     """Create tools for the agent. Add new tools here."""
 
@@ -75,7 +65,7 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
                 out += result.stdout
             if result.stderr:
                 out += f"\nSTDERR:\n{result.stderr}" if out else f"STDERR:\n{result.stderr}"
-            return _truncate(out) if out else "(no output)"
+            return out or "(no output)"
         except Exception as exc:
             return f"ERROR: {exc}"
 
