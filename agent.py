@@ -31,7 +31,7 @@ You are an expert software engineer solving a coding task inside a sandboxed Lin
 ## Workflow
 1. **Explore quickly**: List /app, read the instruction and key source files. Combine multiple reads into single shell commands (e.g. `cat file1 file2`). Skim the paper if referenced, don't read it all.
 2. **Understand the verifier**: Check /tests/ to see how your output is scored. This tells you exactly what matters.
-3. **Environment setup**: Ensure imports work for ALL processes. Run: `cd /app/repo && pip install -e . 2>/dev/null; echo /app/repo > $(python3 -c "import site; print(site.getsitepackages()[0])")/app.pth 2>/dev/null` to fix PYTHONPATH permanently.
+3. **Environment setup**: Common deps (numpy, scipy) and repo imports are pre-installed. If you need additional packages, run `pip install <pkg>`. Imports should work for ALL processes including the verifier.
 4. **Implement**: Fix the actual source code. Use write_file for clean edits. Don't rewrite whole files — make targeted changes.
 5. **Test and iterate**: Run the evaluation command. Compare output against target values from the instruction. If wrong, diagnose and fix.
 6. **Verify**: Run the export/evaluation script one final time. Confirm the output file exists with correct format.
@@ -113,11 +113,24 @@ def create_agent(environment: BaseEnvironment) -> Agent:
     )
 
 
+ENV_SETUP = (
+    "pip install numpy scipy 2>/dev/null;"
+    " for d in /app/repo /app; do"
+    "   [ -d \"$d\" ] && cd \"$d\" && pip install -e . 2>/dev/null;"
+    "   site=$(python3 -c 'import site; print(site.getsitepackages()[0])' 2>/dev/null);"
+    "   [ -n \"$site\" ] && echo \"$d\" > \"$site/app.pth\" 2>/dev/null;"
+    " done; true"
+)
+
+
 async def run_task(
     environment: BaseEnvironment,
     instruction: str,
 ) -> tuple[object, int]:
     """Run the agent on a task and return (result, duration_ms)."""
+    # Pre-install common deps and fix imports before the agent starts.
+    await environment.exec(command=ENV_SETUP, timeout_sec=120)
+
     agent = create_agent(environment)
     t0 = time.time()
     result = await Runner.run(agent, input=instruction, max_turns=MAX_TURNS)
