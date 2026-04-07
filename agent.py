@@ -104,7 +104,7 @@ def create_agent(environment: BaseEnvironment) -> Agent:
         model_settings=ModelSettings(
             truncation="auto",
             parallel_tool_calls=True,
-            reasoning=Reasoning(effort="medium"),
+            reasoning=Reasoning(effort="medium", generate_summary="concise"),
         ),
     )
 
