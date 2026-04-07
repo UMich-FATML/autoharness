@@ -36,7 +36,7 @@ Rules:
 - Fix actual source code, not just output files.
 - Changes must work for the verifier too (separate process, no env vars from your shell).
 - Compare results to target values in the instruction. If wrong, re-read the paper and fix.
-- Combine reads into single commands. Don't explore what you won't modify.
+- Combine reads into single commands. Don't re-read the instruction or explore what you won't modify.
 """
 MODEL = "gpt-5"
 MAX_TURNS = 45
