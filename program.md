@@ -111,11 +111,11 @@ performance with simpler code is a real improvement.
 ## How to Run
 
 ```bash
-docker build -f Dockerfile.base -t autoagent-base .
-rm -rf jobs; mkdir -p jobs && uv run harbor run -p tasks/ -n 100 --agent-import-path agent:AutoAgent -o jobs --job-name latest > run.log 2>&1
+rm -rf jobs; mkdir -p jobs && pixi run harbor run -p tasks/ -n 100 --agent-import-path agent:AutoAgent -e daytona -o jobs --job-name latest > run.log 2>&1
 ```
 
-This assumes the current branch includes benchmark tasks.
+This uses Daytona cloud sandboxes (there is no local Docker daemon). It assumes
+the current branch includes benchmark tasks.
 
 ## Logging Results
 

@@ -38,32 +38,31 @@ meta-agent hill-climbs on this score.
 
 ## Quick start
 
-**Requirements:** Docker, Python 3.10+, [uv](https://docs.astral.sh/uv/), and
-whatever model-provider credentials your current `agent.py` harness requires.
+**Requirements:** Python 3.10+, [pixi](https://pixi.sh/), a
+[Daytona](https://www.daytona.io/) API key, and whatever model-provider
+credentials your current `agent.py` harness requires.
 
 ```bash
-# 1. Install uv (if you don't have it)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# 1. Install pixi (if you don't have it)
+curl -fsSL https://pixi.sh/install.sh | sh
 
 # 2. Install dependencies
-uv sync
+pixi install
 
 # 3. Set up the environment variables required by your current agent/runtime
 # Example:
 cat > .env << 'EOF'
+DAYTONA_API_KEY=...
 OPENAI_API_KEY=...
 EOF
 
-# 4. Build base image
-docker build -f Dockerfile.base -t autoagent-base .
+# 4. Add tasks to tasks/ (see Task format section below)
 
-# 5. Add tasks to tasks/ (see Task format section below)
+# 5. Run a single benchmark task
+rm -rf jobs; mkdir -p jobs && pixi run harbor run -p tasks/ --include-task-name "<task-name>" -l 1 -n 1 --agent-import-path agent:AutoAgent -e daytona -o jobs --job-name latest > run.log 2>&1
 
-# 6. Run a single benchmark task
-rm -rf jobs; mkdir -p jobs && uv run harbor run -p tasks/ --task-name "<task-name>" -l 1 -n 1 --agent-import-path agent:AutoAgent -o jobs --job-name latest > run.log 2>&1
-
-# 7. Run all tasks in parallel (-n = concurrency, default 4)
-rm -rf jobs; mkdir -p jobs && uv run harbor run -p tasks/ -n 100 --agent-import-path agent:AutoAgent -o jobs --job-name latest > run.log 2>&1
+# 6. Run all tasks in parallel (-n = concurrency, default 4)
+rm -rf jobs; mkdir -p jobs && pixi run harbor run -p tasks/ -n 100 --agent-import-path agent:AutoAgent -e daytona -o jobs --job-name latest > run.log 2>&1
 ```
 
 ## Running the meta-agent
@@ -84,7 +83,6 @@ agent.py                       -- single-file harness under test
   editable harness section     -- prompt, registries, tools, routing
   fixed adapter section        -- Harbor integration + trajectory serialization
 program.md                     -- meta-agent instructions + directive
-Dockerfile.base                -- base image
 .agent/                        -- optional agent workspace artifacts
 tasks/                         -- benchmark tasks, typically added in benchmark-specific branches
 jobs/                          -- Harbor job outputs
@@ -104,7 +102,7 @@ tasks/my-task/
     test.sh           -- entry point, writes /logs/reward.txt
     test.py           -- verification (deterministic or LLM-as-judge)
   environment/
-    Dockerfile        -- task container (FROM autoagent-base)
+    Dockerfile        -- task container image definition
   files/              -- reference files mounted into container
 ```
 
@@ -118,7 +116,7 @@ on this. See the [Harbor docs](https://harborframework.com/docs) for full detail
 - **Single-file, registry-driven harness.** The implementation lives in one
   file for simplicity, but agent and tool registration stay structured so the
   harness can still evolve cleanly.
-- **Docker isolation.** The agent runs in a container. It can't damage the host.
+- **Daytona cloud sandboxes.** The agent runs in a remote sandbox. It can't damage the host.
 - **Score-driven.** Every experiment produces a numeric score. Keep if better,
   discard if not. Same loop as autoresearch.
 - **Harbor-compatible tasks.** Tasks use the same format as harbor benchmarks,
@@ -126,24 +124,10 @@ on this. See the [Harbor docs](https://harborframework.com/docs) for full detail
 
 ## Cleanup
 
-Docker images and containers accumulate across runs. Clean up regularly:
+Harbor caches task images across runs. Clean up regularly:
 
 ```bash
-# Harbor's cached task images + task cache
-uv run harbor cache clean -f
-
-# Full Docker nuke (all unused images, build cache, etc.)
-docker system prune -a -f
-
-# Lighter: just dead containers
-docker container prune -f
-```
-
-If Docker becomes unresponsive (for example after many concurrent runs), restart
-Docker Desktop:
-
-```bash
-killall Docker && open -a Docker
+pixi run harbor cache clean -f
 ```
 
 ## Improving performance with skills

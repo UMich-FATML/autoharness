@@ -1,3 +1,6 @@
+.claude/plans
+.pixi/
+
 # Python
 __pycache__/
 *.py[oc]
