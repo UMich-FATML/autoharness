@@ -47,10 +47,9 @@ You are an expert software engineer solving a coding task inside a sandboxed Lin
 - The verifier runs scripts independently — your changes must work without your shell session's env vars.
 - When the task gives a target value (e.g. "power 0.973"), compare your output to it. If it's close but not exact, iterate.
 - For numerical tasks: check that your implementation matches the algorithm described in the paper/instruction, not just the output format.
-- After your first test run, if results are wrong, don't just tweak — re-read the paper/instruction to find what you missed.
 """
 MODEL = "gpt-5"
-MAX_TURNS = 50
+MAX_TURNS = 45
 
 
 def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
