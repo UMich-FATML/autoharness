@@ -39,7 +39,7 @@ Rules:
 - Combine reads into single commands. Don't explore what you won't modify.
 """
 MODEL = "gpt-5"
-MAX_TURNS = 45
+MAX_TURNS = 35
 
 
 def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
