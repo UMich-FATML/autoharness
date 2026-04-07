@@ -1,0 +1,5 @@
+Implement the cached upper-bound rho table used by the individual Rényi filter in Sections 6.5 and 8.4 of the staged S-BDT paper. The staged repo currently uses an intentionally coarse cache, so off-grid sensitivity queries produce a noticeably looser approximation than the intended fine-grained lookup table.
+
+Use `/app/repo/pwc_tasks/export_renyi_approximation.py` to write `/app/output/renyi_approximation.json`. The JSON must contain exactly these top-level keys: `rdp_alpha`, `noise_scale`, `subsampling_ratio`, `leaf_noise_weight`, and `queries`. Each entry of `queries` must contain exactly `gradient_sensitivity`, `hessian_sensitivity`, `exact_rho`, `approx_rho`, and `approx_ge_exact`. Round floating-point values to 6 decimals.
+
+You can modify the staged C++ approximation cache, run the helper, inspect the exact-versus-approximate rho values, and iterate. Your score is based on how tightly the cached upper bound matches the staged target approximation on both the public query grid and a second hidden grid, with partial credit for reducing the approximation gap.

@@ -1,0 +1,20 @@
+version = "1.0"
+
+[metadata]
+author_name = "OpenAI Codex"
+author_email = ""
+difficulty = "easy"
+category = "bioinformatics"
+tags = ["papers-with-code", "bioinformatics", "k-mers", "minimizers", "python"]
+
+[verifier]
+timeout_sec = 120.0
+
+[agent]
+timeout_sec = 300.0
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory = "4G"
+storage = "10G"

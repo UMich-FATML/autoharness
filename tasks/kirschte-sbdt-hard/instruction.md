@@ -1,0 +1,5 @@
+Implement the individual Rényi-filter extra-round schedule for the staged non-IID stream setting from Sections 3.3, 6.6, and 8.4 of `/app/paper/paper.md`. The staged helper currently mishandles which previously seen ids stay eligible in extra rounds and fails to saturate retired ids at the privacy cap.
+
+Use `/app/repo/pwc_tasks/export_stream_filter_schedule.py` to write `/app/output/stream_filter_schedule.json`. The JSON must contain exactly these top-level keys: `rdp_alpha`, `noise_scale`, `max_rho`, `regular_rounds`, `extra_rounds`, `initial_ids`, `novel_ids`, `final_accounted_rho`, `active_ids_by_extra_round`, and `retired_ids`. `active_ids_by_extra_round` must list the ids that remain eligible after each extra round, and `final_accounted_rho` must map every id to its final accumulated rho rounded to 6 decimals.
+
+You can modify the staged filter-schedule implementation, run the helper, inspect the retained-id sets and accumulated rho values, and iterate. Your score is based on how closely the implemented schedule reproduces the staged target trace on both the public non-IID fixture and a second hidden trace; partial progress receives partial credit.

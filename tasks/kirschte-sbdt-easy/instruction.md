@@ -1,0 +1,5 @@
+Implement the tight subsampled Rényi accountant used in Sections 5.1 and 6.5 of the staged S-BDT paper. The current staged accountant applies a loose subsampling term, so the Abalone-style fixture lands on a much weaker privacy bound than the paper's tight-bound regime.
+
+The codebase already includes the privacy probe and the JSON exporter at `/app/repo/pwc_tasks/export_accountant_fixture.py`. Update the repo implementation so that running that helper writes `/app/output/accountant_fixture.json` with exactly these top-level keys: `case_name`, `newton_boosting`, `subsampling_ratio`, `leaf_noise_weight`, `compositions`, `alpha`, `noise_scale`, `max_rho`, `eps`, and `leaf_rho_alpha_31`. Keep `alpha` and `compositions` as integers and round floating-point values to 6 decimals.
+
+You can modify the staged C++ accountant, run the helper, inspect the reported privacy quantities, and iterate. Your score is based on how closely the implemented accountant reproduces the staged target privacy-accounting values; partial progress toward the target receives partial credit, and the verifier also checks a second hidden fixture through the same code path.

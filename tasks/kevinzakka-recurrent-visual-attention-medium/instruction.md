@@ -1,0 +1,5 @@
+Implement the paper's glimpse network and recurrent core for the reduced cluttered translated-digit slice and write your final metrics to `/app/results.json`. Section 4 of *Recurrent Models of Visual Attention* defines the glimpse encoder as `g = Rect(Linear(h_g) + Linear(h_l))` and the classification core as `h_t = Rect(Linear(h_{t-1}) + Linear(g_t))`; Table 1 shows that stacking these components with `8x8` glimpses is enough to drive MNIST error down to `1.12%` in the full model. This reduced slice keeps the fixation locations fixed and scores you against a hidden accuracy target of `0.9458`.
+
+The retina sensor and cluttered train/dev splits are already staged, but `/app/modules.py` still returns naive zero features for the glimpse and recurrent state updates. You can edit the code, run `python /app/main.py --split dev --output /app/results.json`, inspect the dev accuracy, and iterate.
+
+Write your final result to `/app/results.json`. Your score is based on how close the hidden accuracy gets to the staged paper-aligned target, so partial progress receives partial credit.

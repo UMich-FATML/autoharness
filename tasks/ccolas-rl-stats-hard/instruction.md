@@ -1,0 +1,5 @@
+Implement the resampling-heavy part of the paper's `unequal_dist_unequal_var_1` study: the ranked t-test, the bootstrap confidence-interval test, and the permutation test for the `Table 13` medium-effect (`epsilon = 1.0`) `N = 20` normal-vs-log-normal comparison. The paper targets for this row are ranked-t power `1.000`, bootstrap power `0.966`, and permutation power `0.989`.
+
+The codebase already generates fixed deterministic study batches and writes `/app/results.json` when you run `python3 /app/run_experiment.py --scenario table13_medium_n20_resampling_row`. The current implementation in `/app/rl_stats/stats_impl.py` still uses shortcuts for the ranked t-test, bootstrap, and permutation procedures.
+
+You can modify the code, rerun the provided scenario, inspect `/app/results.json`, and iterate. Your final output must be `/app/results.json` with exactly the keys `"paper_targets"`, `"powers"`, and `"scenario"`. Your score is based on how close the achieved powers get to the paper's reported row, and partial progress receives partial credit.

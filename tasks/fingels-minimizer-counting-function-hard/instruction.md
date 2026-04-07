@@ -1,0 +1,3 @@
+Fit the asymptotic linear model discussed around Figure 8 and Conjecture 2 in `/app/paper/paper.md` for the staged `m=6` minimizer panel in `/app/repo`. The report must be based on `log_4 pi_k(w)` over `k=6..16`, not on the raw counts.
+
+Write `/app/output/asymptotic_report.json` with exactly these top-level keys: `k_values`, `prediction_k`, and `panel`. `k_values` must be the integers `6` through `16`, `prediction_k` must be `20`, and each entry in `panel` must include `minimizer`, `log4_values`, `slope`, `intercept`, `r2`, and `predicted_log4_pi_k20`, with every floating-point value rounded to 12 decimal places.

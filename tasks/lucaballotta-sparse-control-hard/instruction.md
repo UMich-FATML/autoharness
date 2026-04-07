@@ -1,0 +1,5 @@
+Rebuild the complete `s`-sparse greedy scheduler from Algorithm 1 in `/app/repo/control_design/control_design.py` so the staged code reproduces the Example 1 result from Table II of the paper. The paper reports that the `s`-sparse greedy schedule reaches control-energy cost `Tr((W_S^h)^-1) = 5.0` on the fixed `n=5, m=7, s=1, h=5` benchmark.
+
+The codebase already contains the Example 1 matrices and the controllability-Gramian cost, but the scheduler no longer performs the paper’s preselection and rank-aware augmentation phases. Restore the algorithm so it builds the constrained schedule end to end, run `python /app/repo/pwc_tasks/export_example1_report.py`, inspect `/app/results.json`, and iterate.
+
+Write your final result to `/app/results.json` as a JSON object with exactly these top-level keys: `schedule`, `rank`, `example1_cost`, `fully_actuated_cost`, and `naive_cost`. Your score is based on how close the measured schedule gets to the paper's Example 1 result, so partial implementations that improve the rank or move the cost toward `5.0` receive partial credit.

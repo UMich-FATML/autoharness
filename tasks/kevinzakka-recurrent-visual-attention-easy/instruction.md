@@ -1,0 +1,5 @@
+Implement the paper's retina-like glimpse sensor for the reduced translated-digit slice and write your final metrics to `/app/results.json`. Table 1 of *Recurrent Models of Visual Attention* reports that single-scale `8x8` glimpses support the RAM classifier, reaching `1.12%` error with `6` glimpses on centered MNIST; this staged slice keeps the same `8x8`, `1`-scale observation primitive but fits a lightweight linear readout on top of your sensor and scores you against a hidden accuracy target of `1.0000`.
+
+The code already generates train and dev splits and supplies the correct fixation location for each example, but `/app/modules.py` still uses a center-crop baseline instead of a location-conditioned retina. You can edit the code, run `python /app/main.py --split dev --output /app/results.json`, inspect the dev accuracy, and iterate.
+
+Write your final result to `/app/results.json`. Your score is based on how close the hidden accuracy gets to the staged paper-aligned target, so partial progress receives partial credit.

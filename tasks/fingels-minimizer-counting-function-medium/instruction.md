@@ -1,0 +1,3 @@
+Recreate the Section 5.2 bounds comparison from `/app/paper/paper.md` on the staged `m=6` minimizer panel in `/app/repo`, including the exact count, the lower and upper bounds, and the order-of-magnitude errors used to discuss Figure 6.
+
+Write `/app/output/bounds_report.json` with exactly these top-level keys: `panel`, `k_values`, `results`, and `summary`. `panel` must be `["AAAAAA", "ACACAA", "ACACAC", "CAAAAA", "GAAAAA", "TAAAAA"]`, `k_values` must be `[10, 16]`, each entry in `results` must include `minimizer`, `lower`, `exact`, `upper`, `eta_plus`, `eta_minus`, `tight`, and `equal_bounds`, and `eta_plus`/`eta_minus` must be rounded to 12 decimal places.

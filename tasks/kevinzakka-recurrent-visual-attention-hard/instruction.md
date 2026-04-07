@@ -1,0 +1,5 @@
+Implement the full reduced attention rollout for the cluttered translated-digit slice and write your final metrics to `/app/results.json`. Section 3.1 of *Recurrent Models of Visual Attention* couples a retina sensor, a recurrent core, and a location network that predicts the next fixation from the current hidden state; Table 2 shows why that policy matters by comparing learned cluttered-MNIST glimpses against `8 random glimpses`. This staged slice starts from a center glimpse, fits a lightweight location head and classifier on the train split, and scores you against a hidden accuracy target of `0.7875`.
+
+The cluttered train/dev splits and evaluation harness are already staged, but `/app/modules.py` still contains naive zero baselines for the glimpse encoder, the recurrent core, and the location network. You can edit the code, run `python /app/main.py --split dev --output /app/results.json`, inspect both digit accuracy and position accuracy, and iterate.
+
+Write your final result to `/app/results.json`. Your score is based on how close the hidden accuracy gets to the staged paper-aligned target, so partial progress receives partial credit.
