@@ -49,7 +49,7 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
     async def run_shell(command: str) -> str:
         """Run a shell command in the task environment. Returns stdout and stderr."""
         try:
-            result = await environment.exec(command=command, timeout_sec=300)
+            result = await environment.exec(command=command, timeout_sec=180)
             out = ""
             if result.stdout:
                 out += result.stdout
