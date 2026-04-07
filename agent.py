@@ -25,9 +25,27 @@ from harbor.models.agent.context import AgentContext
 # EDITABLE HARNESS — prompt, tools, agent construction
 # ============================================================================
 
-SYSTEM_PROMPT = "You are an agent that executes tasks"
+SYSTEM_PROMPT = """\
+You are an expert software engineer solving a coding task inside a sandboxed Linux environment.
+
+## Workflow
+1. **Explore**: Read the task instruction. List /app to understand the repo structure. Read key source files and any paper/documentation.
+2. **Understand**: Identify what needs to be implemented or fixed. Find placeholder/stub functions. Read the verifier test to understand how your output will be scored.
+3. **Environment setup**: Ensure dependencies are installed. Run `pip install -e .` in repo dirs or set PYTHONPATH globally: `echo '/app/repo' > /usr/local/lib/python3.*/site-packages/app.pth` so imports work for ALL processes (including the verifier).
+4. **Implement**: Make targeted code changes. Edit existing files rather than rewriting from scratch. Use `write_file` to write changes cleanly.
+5. **Test**: Run the evaluation command from the instruction. Check the output file. If results are wrong, iterate.
+6. **Verify**: Before finishing, confirm the output file exists and has the required format/keys. Run the same export/evaluation script one final time to make sure it works standalone.
+
+## Key principles
+- Read before writing. Understand the existing code before modifying it.
+- Fix the actual source code in the repository, don't just write output files with hardcoded values.
+- The verifier runs scripts independently — your changes must work without your shell session's env vars. Install packages and fix imports permanently.
+- Check /tests/ if it exists to understand how your work will be verified.
+- Budget your turns. Don't waste turns on exploration you don't need.
+- For Python file edits, use the write_file tool for reliability.
+"""
 MODEL = "gpt-5"
-MAX_TURNS = 30
+MAX_TURNS = 60
 
 
 def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
@@ -37,7 +55,7 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
     async def run_shell(command: str) -> str:
         """Run a shell command in the task environment. Returns stdout and stderr."""
         try:
-            result = await environment.exec(command=command, timeout_sec=120)
+            result = await environment.exec(command=command, timeout_sec=300)
             out = ""
             if result.stdout:
                 out += result.stdout
@@ -47,7 +65,37 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
         except Exception as exc:
             return f"ERROR: {exc}"
 
-    return [run_shell]
+    @function_tool
+    async def read_file(path: str, offset: int = 0, limit: int = 500) -> str:
+        """Read lines from a file. Returns numbered lines starting from `offset` (0-based), up to `limit` lines."""
+        try:
+            result = await environment.exec(
+                command=f"sed -n '{offset + 1},{offset + limit}p' '{path}' | cat -n",
+                timeout_sec=30,
+            )
+            content = result.stdout or ""
+            if not content.strip():
+                return f"(empty or file not found: {path})"
+            return content
+        except Exception as exc:
+            return f"ERROR: {exc}"
+
+    @function_tool
+    async def write_file(path: str, content: str) -> str:
+        """Write content to a file, creating parent directories as needed. Overwrites if the file exists."""
+        import base64
+        encoded = base64.b64encode(content.encode()).decode()
+        try:
+            result = await environment.exec(
+                command=f"mkdir -p \"$(dirname '{path}')\" && echo '{encoded}' | base64 -d > '{path}' && echo 'OK: wrote {path}'",
+                timeout_sec=30,
+            )
+            out = (result.stdout or "") + (result.stderr or "")
+            return out.strip() or f"OK: wrote {path}"
+        except Exception as exc:
+            return f"ERROR: {exc}"
+
+    return [run_shell, read_file, write_file]
 
 
 def create_agent(environment: BaseEnvironment) -> Agent:
