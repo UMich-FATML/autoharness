@@ -89,30 +89,7 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
         except Exception as exc:
             return f"ERROR: {exc}"
 
-    @function_tool
-    async def replace_in_file(path: str, old_text: str, new_text: str) -> str:
-        """Replace the first occurrence of old_text with new_text in a file. More efficient than write_file for small edits."""
-        import base64
-        old_b64 = base64.b64encode(old_text.encode()).decode()
-        new_b64 = base64.b64encode(new_text.encode()).decode()
-        script = (
-            f"python3 -c \""
-            f"import base64; p='{path}';"
-            f"old=base64.b64decode('{old_b64}').decode();"
-            f"new=base64.b64decode('{new_b64}').decode();"
-            f"t=open(p).read();"
-            f"assert old in t, 'old_text not found';"
-            f"open(p,'w').write(t.replace(old,new,1));"
-            f"print('OK: patched',p)\""
-        )
-        try:
-            result = await environment.exec(command=script, timeout_sec=30)
-            out = (result.stdout or "") + (result.stderr or "")
-            return out.strip() or f"OK: patched {path}"
-        except Exception as exc:
-            return f"ERROR: {exc}"
-
-    return [run_shell, read_file, write_file, replace_in_file]
+    return [run_shell, read_file, write_file]
 
 
 def create_agent(environment: BaseEnvironment) -> Agent:
