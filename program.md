@@ -20,20 +20,29 @@ constraint.
 
 ## Setup
 
-Before starting a new experiment:
+Each experiment series lives on its own branch named 
+`<short-sha>-<model-name>`, where the SHA is the baseline commit the 
+branch was created from. Before starting a new experiment: 
 
 1. Read `README.md`, this file, and `agent.py`.
 2. Read `docs/openai-agents-python/tools.md` for tool
    design patterns, `agent.as_tool()`, and handoff mechanics.
-3. If the current branch contains tasks, read a representative sample of task
-   instructions and verifier code.
-4. Check whether runtime dependencies are missing.
-5. Update `pyproject.toml` only if needed.
-6. Verify the agent imports cleanly.
-7. Initialize `results.tsv` if it does not exist.
+3. Create an experiment branch from `main`:
+   `git checkout -b <short-sha>-<model-name>` (e.g. `9aadb93-gpt-5`).
+4. Commit the tasks in `tasks/` to the branch:
+   `git add -f tasks/ && git commit -m "add benchmark tasks"`.
+5. Read a representative sample of task instructions and verifier code.
+6. Check whether runtime dependencies are missing.
+7. Update `pyproject.toml` only if needed.
+8. Verify the agent imports cleanly.
+9. Initialize `results.tsv` if it does not exist.
 
 The first run must always be the unmodified baseline. Establish the baseline
 before trying any ideas.
+
+Never squash or rewrite the branch history. The full sequence of commits and
+reverts is the experiment log and must be preserved. `results.tsv` mirrors
+this: every run gets a row, kept or discarded.
 
 ## What You Can Modify
 
