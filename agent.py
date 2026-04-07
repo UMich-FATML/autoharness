@@ -104,7 +104,6 @@ def create_agent(environment: BaseEnvironment) -> Agent:
             truncation="auto",
             parallel_tool_calls=True,
             verbosity="low",
-            prompt_cache_retention="in_memory",
         ),
     )
 
