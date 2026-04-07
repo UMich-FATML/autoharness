@@ -103,6 +103,7 @@ def create_agent(environment: BaseEnvironment) -> Agent:
         model_settings=ModelSettings(
             truncation="auto",
             parallel_tool_calls=True,
+            max_tokens=4096,
         ),
     )
 
