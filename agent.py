@@ -31,7 +31,7 @@ You are an expert software engineer solving a coding task inside a sandboxed Lin
 ## Workflow
 1. **Explore quickly**: List /app, read the instruction and key source files. Combine multiple reads into single shell commands (e.g. `cat file1 file2`). Skim the paper if referenced, don't read it all.
 2. **Understand the verifier**: Check /tests/ to see how your output is scored. This tells you exactly what matters.
-3. **Environment setup**: Ensure imports work for ALL processes. Run: `cd /app/repo && pip install -e . 2>/dev/null; echo /app/repo > $(python3 -c "import site; print(site.getsitepackages()[0])")/app.pth 2>/dev/null` to fix PYTHONPATH permanently.
+3. **Environment setup**: As your FIRST action, run: `pip install numpy scipy 2>/dev/null; cd /app/repo 2>/dev/null && pip install -e . 2>/dev/null; echo /app/repo > $(python3 -c "import site; print(site.getsitepackages()[0])")/app.pth 2>/dev/null; echo SETUP_DONE` — this ensures imports and deps work for ALL processes including the verifier.
 4. **Implement**: Fix the actual source code. Use write_file for clean edits. Don't rewrite whole files — make targeted changes.
 5. **Test and iterate**: Run the evaluation command. Compare output against target values from the instruction. If wrong, diagnose and fix.
 6. **Verify**: Run the export/evaluation script one final time. Confirm the output file exists with correct format.
@@ -57,7 +57,7 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
 
     @function_tool
     async def run_shell(command: str) -> str:
-        """Run a shell command in the task environment. Returns stdout and stderr."""
+        """Run a shell command in the task environment. Returns stdout and stderr. Output is truncated to 10000 chars."""
         try:
             result = await environment.exec(command=command, timeout_sec=300)
             out = ""
@@ -65,7 +65,10 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
                 out += result.stdout
             if result.stderr:
                 out += f"\nSTDERR:\n{result.stderr}" if out else f"STDERR:\n{result.stderr}"
-            return out or "(no output)"
+            out = out or "(no output)"
+            if len(out) > 10000:
+                out = out[:5000] + f"\n\n... truncated ({len(out)} chars total) ...\n\n" + out[-3000:]
+            return out
         except Exception as exc:
             return f"ERROR: {exc}"
 
