@@ -23,13 +23,13 @@ constraint.
 Before starting a new experiment:
 
 1. Read `README.md`, this file, and `agent.py`.
-2. Read `docs/good-harness.md` and `docs/openai-agents-sdk/tools.md` for tool
+2. Read `docs/openai-agents-python/tools.md` for tool
    design patterns, `agent.as_tool()`, and handoff mechanics.
 3. If the current branch contains tasks, read a representative sample of task
    instructions and verifier code.
 4. Check whether runtime dependencies are missing.
-5. Update `pyproject.toml` or `Dockerfile.base` only if needed.
-6. Build the base image and verify the agent imports cleanly.
+5. Update `pyproject.toml` only if needed.
+6. Verify the agent imports cleanly.
 7. Initialize `results.tsv` if it does not exist.
 
 The first run must always be the unmodified baseline. Establish the baseline
@@ -69,7 +69,7 @@ dimensions, sample values), targeted cell reading, and validated cell writing.
 The SDK also supports `agent.as_tool()` — wrapping an agent as a callable tool
 for the main agent. A practical use: a verification sub-agent that re-reads the
 produced output and checks it against the task requirements before the main
-agent finishes. See `docs/openai-agents-sdk/tools.md` for details.
+agent finishes. See `docs/openai-agents-python/tools.md` for details.
 
 ## What You Must Not Modify
 
