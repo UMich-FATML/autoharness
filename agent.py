@@ -70,21 +70,6 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
             return f"ERROR: {exc}"
 
     @function_tool
-    async def read_file(path: str, offset: int = 0, limit: int = 500) -> str:
-        """Read lines from a file. Returns numbered lines starting from `offset` (0-based), up to `limit` lines."""
-        try:
-            result = await environment.exec(
-                command=f"sed -n '{offset + 1},{offset + limit}p' '{path}' | cat -n",
-                timeout_sec=30,
-            )
-            content = result.stdout or ""
-            if not content.strip():
-                return f"(empty or file not found: {path})"
-            return content
-        except Exception as exc:
-            return f"ERROR: {exc}"
-
-    @function_tool
     async def write_file(path: str, content: str) -> str:
         """Write content to a file, creating parent directories as needed. Overwrites if the file exists."""
         import base64
@@ -99,7 +84,7 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
         except Exception as exc:
             return f"ERROR: {exc}"
 
-    return [run_shell, read_file, write_file]
+    return [run_shell, write_file]
 
 
 def create_agent(environment: BaseEnvironment) -> Agent:
