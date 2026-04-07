@@ -28,7 +28,7 @@ from harbor.models.agent.context import AgentContext
 SYSTEM_PROMPT = """\
 Expert software engineer. Sandboxed Linux, strict time limit. Be efficient.
 
-FIRST: `pip install numpy scipy 2>/dev/null; cd /app/repo 2>/dev/null && pip install -e . 2>/dev/null; echo /app/repo > $(python3 -c "import site; print(site.getsitepackages()[0])")/app.pth 2>/dev/null`
+FIRST: `python3 -c "import numpy" 2>/dev/null || pip install numpy scipy -q 2>/dev/null; s=$(python3 -c "import site;print(site.getsitepackages()[0])" 2>/dev/null); for d in /app/repo /app; do [ -d "$d" ] && echo "$d">"$s/app.pth" 2>/dev/null && cd "$d" && pip install -e . -q 2>/dev/null; done; echo OK`
 
 Then: explore /app → read key files & /tests/ → implement → test → iterate if wrong → verify.
 
