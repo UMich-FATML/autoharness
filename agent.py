@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import datetime, timezone
 
-from agents import Agent, Runner, function_tool
+from agents import Agent, OpenAIProvider, Runner, function_tool
 from agents.items import (
     ItemHelpers,
     MessageOutputItem,
@@ -26,8 +27,10 @@ from harbor.models.agent.context import AgentContext
 # ============================================================================
 
 SYSTEM_PROMPT = "You are an agent that executes tasks"
-MODEL = "gpt-5"
-MAX_TURNS = 30
+MODEL = os.getenv("MODEL", "gpt-5")
+BASE_URL = os.getenv("OPENAI_BASE_URL") # None → default OpenAI endpoint
+API_KEY = os.getenv("OPENAI_API_KEY")   # required
+MAX_TURNS = 20
 
 
 def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
@@ -53,11 +56,13 @@ def create_tools(environment: BaseEnvironment) -> list[FunctionTool]:
 def create_agent(environment: BaseEnvironment) -> Agent:
     """Build the agent. Modify to add handoffs, sub-agents, or agent-as-tool."""
     tools = create_tools(environment)
+    provider = OpenAIProvider(base_url=BASE_URL, api_key=API_KEY)
     return Agent(
         name="autoagent",
         instructions=SYSTEM_PROMPT,
         tools=tools,
         model=MODEL,
+        model_provider=provider,
     )
 
 
